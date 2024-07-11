@@ -1,9 +1,5 @@
 #include <stdio.h>
-// #include "headers/user.h"
-// #include "headers/category.h"
-// #include "headers/product.h"
-// #include "headers/sales.h"
-// #include "headers/utils.h"
+#include "headers/user.h"
 
 int main()
 {
@@ -21,7 +17,7 @@ int main()
           switch (choix)
           {
           case 1:
-               // connexion();
+               connexion();
                break;
           case 2:
                printf("Au revoir !\n");
