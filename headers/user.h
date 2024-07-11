@@ -17,6 +17,9 @@ int ajouter_utilisateur();
 User* lire_utilisateurs(int* taille);
 int supprimer_utilisateur(int user_id);
 
+void afficherMenuUser();
+void afficherMenuAdmin();
+
 int connexion();
 
 

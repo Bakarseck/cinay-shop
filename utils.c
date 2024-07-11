@@ -36,3 +36,10 @@ invalid:
         goto invalid;
     }
 }
+
+// Définition des fichiers
+const char* USER_FILE = "data/user.bin";
+const char* VENTES_FILE = "data/ventes.bin";
+const char* CATEGORY_FILE = "data/category.bin";
+const char* PRODUITS_FILE = "data/produits.bin";
+

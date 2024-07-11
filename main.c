@@ -12,12 +12,24 @@ int main()
           printf("1. Connexion\n");
           printf("2. Quitter\n");
           printf("Choisissez une option: ");
+
           scanf("%d", &choix);
 
+          int role = 0;
           switch (choix)
           {
           case 1:
-               connexion();
+               role = connexion();
+               printf("role = %d", role);
+               if (role == 0) {
+                    afficherMenuAdmin();
+               } else if (role == 1) {
+                    afficherMenuUser();
+               } else if (role == 2) {
+                    printf("Vous êtes bloqués");
+               } else {
+                    printf("Login ou mot de passe incorrect");
+               }
                break;
           case 2:
                printf("Au revoir !\n");

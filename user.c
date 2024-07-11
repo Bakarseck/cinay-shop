@@ -2,8 +2,7 @@
 #include "headers/user.h"
 #include "headers/file.h"
 #include <string.h>
-
-const char* USER_FILE = "data/user.bin";
+#include "headers/utils.h"
 
 int ajouter_utilisateur() {
 
@@ -58,8 +57,16 @@ int connexion() {
           if (strcmp(login, userTemp.login) == 0) {
                if (strcmp(password, userTemp.mot_de_passe) == 0) {
                     printf("Vous êtes connectés");
-                    fclose(fichier);
-                    return 0;
+                    if (strcmp(userTemp.role, "ADMIN") == 0) {
+                         fclose(fichier);
+                         return 0;
+                    } else if (strcmp(userTemp.role, "USER") == 0) {
+                         fclose(fichier);
+                         return 1;
+                    } else if (strcmp(userTemp.role, "USERBLOQUE") == 0) {
+                         fclose(fichier);
+                         return 2;
+                    }
                } else {
                     fclose(fichier);
                     return 1;
@@ -68,5 +75,32 @@ int connexion() {
      }
 
      fclose(fichier);
-     return 1;
-}    
+     return -1;
+}
+
+void afficherMenuUser() {
+     printf("1. Interface Produits\n");
+     printf("2. Interface Caisse\n");
+     printf("3. Imprimer état de la caisse\n");
+     int choix;
+
+     printf("Veuillez entrez votre choix");
+     scanf("%d", &choix);
+
+     switch (choix)
+          {
+          case 1:
+               break;
+          case 2:
+               printf("Au revoir !\n");
+               return 0;
+          case 3:
+               lire_fichier(VENTES_FILE); 
+          default:
+               printf("Option invalide !\n");
+          }
+}
+
+void afficherMenuAdmin() {
+     printf("1. Admin\n");
+}
