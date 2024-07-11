@@ -110,7 +110,7 @@ int auto_increment(const char *chemin_fichier)
 
      while (fscanf(fichier, "%d %s %s %s", &userTemp.user_id, userTemp.nom, userTemp.prenom, userTemp.mot_de_passe) == 4)
      {
-          id = userTemp.user_id; // Récupérer l'identifiant du dernier utilisateur lu
+          id = userTemp.user_id;
      }
 
      fclose(fichier);
