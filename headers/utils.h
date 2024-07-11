@@ -3,7 +3,8 @@
 
 void ScannerInt(int *a);
 int Atoi(char text[255]);
-
+char* chiffrerCesar(char* texte, int decalage);
+char* dechiffrerCesar(char* texte, int decalage);
 
 // Déclaration des fichiers
 extern const char* USER_FILE;

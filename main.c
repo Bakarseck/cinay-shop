@@ -20,7 +20,6 @@ int main()
           {
           case 1:
                role = connexion();
-               printf("role = %d", role);
                if (role == 0) {
                     afficherMenuAdmin();
                } else if (role == 1) {
@@ -28,7 +27,7 @@ int main()
                } else if (role == 2) {
                     printf("Vous êtes bloqués");
                } else {
-                    printf("Login ou mot de passe incorrect");
+                    printf("\033[31mLogin ou mot de passe incorrect\033[0m;");
                }
                break;
           case 2:

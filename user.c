@@ -4,7 +4,8 @@
 #include <string.h>
 #include "headers/utils.h"
 
-int ajouter_utilisateur() {
+int ajouter_utilisateur()
+{
 
      User user;
 
@@ -29,7 +30,8 @@ int ajouter_utilisateur() {
      ajouter_fichier(USER_FILE, line);
 }
 
-int connexion() {
+int connexion()
+{
 
      FILE *fichier = fopen(USER_FILE, "r");
 
@@ -42,34 +44,52 @@ int connexion() {
 
      char login[50];
      char password[50];
+     char chiffre[50];
+     char déchiffre[50];
 
      printf("Veuillez entrez votre login:\n");
      scanf("%s", login);
 
      printf("Veuillez entrez votre password:\n");
-     scanf("%s", password);
 
-     // 1 Rokhaya NDAO rokhyndao 771234567 passer123 USER
+     system("stty -echo");
+     scanf("%s", password);
+     system("stty echo");
+
      while (
-          fscanf(fichier, "%d %s %s %s %s %s %s", &userTemp.user_id, userTemp.nom, userTemp.prenom, userTemp.login, userTemp.telephone,  userTemp.mot_de_passe, userTemp.role) == 7)
+         fscanf(fichier, "%d %s %s %s %s %s %s", &userTemp.user_id, userTemp.nom, userTemp.prenom, userTemp.login, userTemp.telephone, userTemp.mot_de_passe, userTemp.role) == 7)
      {
 
-          if (strcmp(login, userTemp.login) == 0) {
-               if (strcmp(password, userTemp.mot_de_passe) == 0) {
-                    printf("Vous êtes connectés");
-                    if (strcmp(userTemp.role, "ADMIN") == 0) {
+          if (strcmp(login, userTemp.login) == 0)
+          {
+               strcpy(chiffre, password);
+               strcpy(déchiffre, userTemp.mot_de_passe);
+
+               chiffrerCesar(chiffre, 10);
+               dechiffrerCesar(déchiffre, 10);
+
+               if (strcmp(chiffre, userTemp.mot_de_passe) == 0)
+               {
+                    if (strcmp(userTemp.role, "ADMIN") == 0)
+                    {
                          fclose(fichier);
                          return 0;
-                    } else if (strcmp(userTemp.role, "USER") == 0) {
+                    }
+                    else if (strcmp(userTemp.role, "USER") == 0)
+                    {
                          fclose(fichier);
                          return 1;
-                    } else if (strcmp(userTemp.role, "USERBLOQUE") == 0) {
+                    }
+                    else if (strcmp(userTemp.role, "USERBLOQUE") == 0)
+                    {
                          fclose(fichier);
                          return 2;
                     }
-               } else {
+               }
+               else
+               {
                     fclose(fichier);
-                    return 1;
+                    return -1;
                }
           }
      }
@@ -78,29 +98,81 @@ int connexion() {
      return -1;
 }
 
-void afficherMenuUser() {
-     printf("1. Interface Produits\n");
-     printf("2. Interface Caisse\n");
-     printf("3. Imprimer état de la caisse\n");
+void afficherMenuAdmin()
+{
      int choix;
 
-     printf("Veuillez entrez votre choix");
-     scanf("%d", &choix);
+     while (1)
+     {
+          printf("--- Menu Administrateur ---\n");
+          printf("1. Ajouter un utilisateur\n");
+          printf("2. Ajouter une catégorie\n");
+          printf("3. Ajouter un produit\n");
+          printf("4. Lister les utilisateurs\n");
+          printf("5. Lister les catégories\n");
+          printf("6. Lister les produits\n");
+          printf("7. Déconnexion\n");
+          printf("Choisissez une option: ");
+          scanf("%d", &choix);
 
-     switch (choix)
+          switch (choix)
+          {
+          case 1:
+               // Ajouter un utilisateur
+               break;
+          case 2:
+               // Ajouter une catégorie
+               break;
+          case 3:
+               // Ajouter un produit
+               break;
+          case 4:
+               // Lister les utilisateurs
+               break;
+          case 5:
+               break;
+          case 6:
+               break;
+          case 7:
+               printf("Déconnexion réussie.\n");
+               exit(0);
+               return;
+          default:
+               printf("Option invalide. Veuillez réessayer.\n");
+               break;
+          }
+     }
+}
+
+void afficherMenuUser()
+{
+     int choix;
+
+     while (1)
+     {
+          printf("--- Menu Utilisateur ---\n");
+          printf("1. Effectuer une vente\n");
+          printf("2. Imprimer l'état du jour\n");
+          printf("3. Lister les produits\n");
+          printf("4. Déconnexion\n");
+          printf("Choisissez une option: ");
+          scanf("%d", &choix);
+
+          switch (choix)
           {
           case 1:
                break;
           case 2:
-               printf("Au revoir !\n");
-               return 0;
+               break;
           case 3:
-               lire_fichier(VENTES_FILE); 
+               break;
+          case 4:
+               printf("Déconnexion réussie.\n");
+               exit(0);
+               return;
           default:
-               printf("Option invalide !\n");
+               printf("Option invalide. Veuillez réessayer.\n");
+               break;
           }
-}
-
-void afficherMenuAdmin() {
-     printf("1. Admin\n");
+     }
 }

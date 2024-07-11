@@ -9,7 +9,7 @@ typedef struct
      char telephone[20];
      char login[20];
      char mot_de_passe[256]; // Crypté
-     char role[10];          // 'Admin' ou 'Utilisateur'
+     char role[10];          // 'ADMIN' ou 'USER' ou 'USERBLOQUE'
 } User;
 
 // Prototypes des fonctions de gestion des utilisateurs
@@ -17,10 +17,12 @@ int ajouter_utilisateur();
 User* lire_utilisateurs(int* taille);
 int supprimer_utilisateur(int user_id);
 
+void fonctionnaliteUser();
+void fonctionnaliteAdmin();
+
 void afficherMenuUser();
 void afficherMenuAdmin();
 
 int connexion();
-
 
 #endif
