@@ -9,9 +9,11 @@
 #include <ctype.h>
 
 extern const char *USER_FILE;
+extern const char *TEMP_USER_FILE;
 extern const char *VENTES_FILE;
 extern const char *CATEGORY_FILE;
 extern const char *PRODUITS_FILE;
+
 
 typedef struct
 {
@@ -44,7 +46,7 @@ typedef struct
 // Déclaration de la fonction renderText
 void renderText(SDL_Renderer *renderer, const char *text, int x, int y, SDL_Color color, TTF_Font *font);
 
-int ajouter_utilisateur();
+void ajouter_utilisateur(SDL_Renderer *renderer, TTF_Font *font);
 User *lire_utilisateurs(int *taille);
 int supprimer_utilisateur(int user_id);
 void changer_mot_de_passe(SDL_Renderer *renderer, TTF_Font *font);
