@@ -49,72 +49,104 @@ int ajouter_utilisateur()
      return 0;
 }
 
-int connexion()
+int ajouter_categorie()
 {
+     Category category;
 
-     FILE *fichier = fopen(USER_FILE, "r");
+     printf("Veuillez saisir le libellé de la catégorie: \n");
+     scanf("%49s", category.libelle);
 
-     if (fichier == NULL)
+     int id = auto_increment(CATEGORY_FILE);
+     category.category_id = id;
+
+     char line[100];
+     sprintf(line, "%d %s\n", category.category_id, category.libelle);
+
+     if (ajouter_fichier(CATEGORY_FILE, line) == 0)
      {
+          printf("Catégorie ajoutée avec succès.\n");
+          return 0;
+     }
+     else
+     {
+          printf("Erreur lors de l'ajout de la catégorie.\n");
           return -1;
      }
+}
 
-     User userTemp;
-
-     char login[50];
-     char password[50];
-     char chiffre[50];
-     char dechiffre[50];
-
-     printf("Veuillez entrez votre login:\n");
-     scanf("%s", login);
-
-     printf("Veuillez entrez votre password:\n");
-
-     system("stty -echo");
-     scanf("%s", password);
-     system("stty echo");
-
-     while (
-         fscanf(fichier, "%d %s %s %s %s %s %s", &userTemp.user_id, userTemp.nom, userTemp.prenom, userTemp.login, userTemp.telephone, userTemp.mot_de_passe, userTemp.role) == 7)
+void lister_categories()
+{
+     FILE *fichier = fopen(CATEGORY_FILE, "r");
+     if (fichier == NULL)
      {
+          perror("Erreur d'ouverture du fichier des catégories");
+          return;
+     }
 
-          if (strcmp(login, userTemp.login) == 0)
-          {
-               strcpy(chiffre, password);
-               strcpy(dechiffre, userTemp.mot_de_passe);
-
-               chiffrerCesar(chiffre, 10);
-               dechiffrerCesar(dechiffre, 10);
-
-               if (strcmp(chiffre, userTemp.mot_de_passe) == 0)
-               {
-                    if (strcmp(userTemp.role, "ADMIN") == 0)
-                    {
-                         fclose(fichier);
-                         return 0;
-                    }
-                    else if (strcmp(userTemp.role, "USER") == 0)
-                    {
-                         fclose(fichier);
-                         return 1;
-                    }
-                    else if (strcmp(userTemp.role, "USERBLOQUE") == 0)
-                    {
-                         fclose(fichier);
-                         return 2;
-                    }
-               }
-               else
-               {
-                    fclose(fichier);
-                    return -1;
-               }
-          }
+     Category category;
+     printf("--- Liste des Catégories ---\n");
+     while (fscanf(fichier, "%d %49s", &category.category_id, category.libelle) != EOF)
+     {
+          printf("ID: %d, Libellé: %s\n", category.category_id, category.libelle);
      }
 
      fclose(fichier);
-     return -1;
+}
+
+int ajouter_produit()
+{
+     Product product;
+
+     printf("Veuillez saisir la désignation du produit: \n");
+     scanf("%99s", product.designation);
+
+     printf("Veuillez saisir le prix du produit: \n");
+     scanf("%f", &product.prix);
+
+     printf("Veuillez saisir la quantité en stock: \n");
+     scanf("%d", &product.quantite_stock);
+
+     printf("Veuillez saisir le code du produit (5 caractères): \n");
+     scanf("%5s", product.code);
+
+     printf("Veuillez saisir l'ID de la catégorie: \n");
+     scanf("%d", &product.category_id);
+
+     int id = auto_increment(PRODUITS_FILE);
+     product.product_id = id;
+
+     char line[200];
+     sprintf(line, "%d %s %.2f %d %s %d\n", product.product_id, product.designation, product.prix, product.quantite_stock, product.code, product.category_id);
+
+     if (ajouter_fichier(PRODUITS_FILE, line) == 0)
+     {
+          printf("Produit ajouté avec succès.\n");
+          return 0;
+     }
+     else
+     {
+          printf("Erreur lors de l'ajout du produit.\n");
+          return -1;
+     }
+}
+
+void lister_produits()
+{
+     FILE *fichier = fopen(PRODUITS_FILE, "r");
+     if (fichier == NULL)
+     {
+          perror("Erreur d'ouverture du fichier des produits");
+          return;
+     }
+
+     Product product;
+     printf("--- Liste des Produits ---\n");
+     while (fscanf(fichier, "%d %99s %f %d %5s %d", &product.product_id, product.designation, &product.prix, &product.quantite_stock, product.code, &product.category_id) != EOF)
+     {
+          printf("ID: %d, Désignation: %s, Prix: %.2f, Quantité en stock: %d, Code: %s, Catégorie ID: %d\n", product.product_id, product.designation, product.prix, product.quantite_stock, product.code, product.category_id);
+     }
+
+     fclose(fichier);
 }
 
 void afficherMenuAdmin()
@@ -130,30 +162,36 @@ void afficherMenuAdmin()
           printf("4. Lister les utilisateurs\n");
           printf("5. Lister les catégories\n");
           printf("6. Lister les produits\n");
-          printf("7. Déconnexion\n");
+          printf("7. Effectuer une vente\n");
+          printf("8. Imprimer l'état du jour\n");
+          printf("9. Déconnexion\n");
           printf("Choisissez une option: ");
           scanf("%d", &choix);
 
           switch (choix)
           {
           case 1:
-               // Ajouter un utilisateur
                ajouter_utilisateur();
                break;
           case 2:
-               // Ajouter une catégorie
+               ajouter_categorie();
                break;
           case 3:
-               // Ajouter un produit
+               ajouter_produit();
                break;
           case 4:
-               // Lister les utilisateurs
                break;
           case 5:
+               lister_categories();
                break;
           case 6:
+               lister_produits();
                break;
           case 7:
+               break;
+          case 8:
+               break;
+          case 9:
                printf("Déconnexion réussie.\n");
                exit(0);
                return;
