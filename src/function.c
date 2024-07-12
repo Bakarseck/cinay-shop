@@ -10,24 +10,43 @@ int ajouter_utilisateur()
      User user;
 
      printf("Veuillez saisir votre nom: \n");
-     scanf("%s", &user.nom);
+     scanf("%s", user.nom);
 
      printf("Veuillez saisir votre prénom: \n");
-     scanf("%s", &user.prenom);
+     scanf("%s", user.prenom);
 
-     printf("Veuillez saisir votre mot de passe: \n");
-     scanf("%s", &user.mot_de_passe);
+     printf("Veuillez saisir votre téléphone: \n");
+     scanf("%s", user.telephone);
 
-     const char line[255];
+     printf("Veuillez saisir votre login: \n");
+     scanf("%s", user.login);
 
-     int id = 0;
-     id = auto_increment(USER_FILE);
+     strcpy(user.mot_de_passe, "passer123");
 
-     printf("%d", id);
+     printf("Veuillez saisir votre rôle (ADMIN, USER, USERBLOQUE): \n");
+     scanf("%s", user.role);
 
-     sprintf(line, "%d %s %s %s \n", id, user.nom, user.prenom, user.mot_de_passe);
+     int id = auto_increment(USER_FILE);
+     user.user_id = id;
 
-     ajouter_fichier(USER_FILE, line);
+     char line[512];
+     char chiffre[50];
+
+     strcpy(chiffre, user.mot_de_passe);
+     chiffrerCesar(chiffre, 10);
+
+     sprintf(line, "%d %s %s %s %s %s %s\n", user.user_id, user.prenom, user.nom, user.telephone, user.login, chiffre, user.role);
+
+     if (ajouter_fichier(USER_FILE, line) == 0)
+     {
+          printf("Utilisateur ajouté avec succès.\n");
+     }
+     else
+     {
+          printf("Erreur lors de l'ajout de l'utilisateur.\n");
+     }
+
+     return 0;
 }
 
 int connexion()
@@ -45,7 +64,7 @@ int connexion()
      char login[50];
      char password[50];
      char chiffre[50];
-     char déchiffre[50];
+     char dechiffre[50];
 
      printf("Veuillez entrez votre login:\n");
      scanf("%s", login);
@@ -63,10 +82,10 @@ int connexion()
           if (strcmp(login, userTemp.login) == 0)
           {
                strcpy(chiffre, password);
-               strcpy(déchiffre, userTemp.mot_de_passe);
+               strcpy(dechiffre, userTemp.mot_de_passe);
 
                chiffrerCesar(chiffre, 10);
-               dechiffrerCesar(déchiffre, 10);
+               dechiffrerCesar(dechiffre, 10);
 
                if (strcmp(chiffre, userTemp.mot_de_passe) == 0)
                {
@@ -119,6 +138,7 @@ void afficherMenuAdmin()
           {
           case 1:
                // Ajouter un utilisateur
+               ajouter_utilisateur();
                break;
           case 2:
                // Ajouter une catégorie
@@ -345,7 +365,8 @@ int auto_increment(const char *chemin_fichier)
      int id = 0;
      User userTemp;
 
-     while (fscanf(fichier, "%d %s %s %s", &userTemp.user_id, userTemp.nom, userTemp.prenom, userTemp.mot_de_passe) == 4)
+     while (
+         fscanf(fichier, "%d %s %s %s %s %s %s", &userTemp.user_id, userTemp.nom, userTemp.prenom, userTemp.login, userTemp.telephone, userTemp.mot_de_passe, userTemp.role) == 7)
      {
           id = userTemp.user_id;
      }
