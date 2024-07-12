@@ -1,44 +1,145 @@
 #include "../headers/header.h"
 
 const char *USER_FILE = "../data/user.bin";
+const char *TEMP_USER_FILE = "../data/user_temp.bin";
 const char *VENTES_FILE = "../data/ventes.bin";
 const char *CATEGORY_FILE = "../data/category.bin";
 const char *PRODUITS_FILE = "../data/produits.bin";
 
-int ajouter_utilisateur()
+void ajouter_utilisateur(SDL_Renderer *renderer, TTF_Font *font)
 {
+     char nom[50] = {0};
+     char prenom[50] = {0};
+     char telephone[20] = {0};
+     char login[6] = {0};
+     char mot_de_passe[256] = {0};
+     int nom_length = 0, prenom_length = 0, telephone_length = 0, login_length = 0, mot_de_passe_length = 0;
+     int field = 0;
+     char chiffre[20];
+
+     SDL_Color white = {255, 255, 255, 255};
+
+     int running = 1;
+     SDL_StartTextInput();
+
+     while (running)
+     {
+          SDL_Event event;
+          while (SDL_PollEvent(&event))
+          {
+               if (event.type == SDL_QUIT)
+               {
+                    SDL_Quit();
+                    TTF_Quit();
+                    exit(0);
+               }
+               else if (event.type == SDL_KEYDOWN)
+               {
+                    if (event.key.keysym.sym == SDLK_RETURN)
+                    {
+                         if (field == 4)
+                         {
+                              running = 0;
+                         }
+                         else
+                         {
+                              field++;
+                         }
+                    }
+                    else if (event.key.keysym.sym == SDLK_BACKSPACE)
+                    {
+                         if (field == 0 && nom_length > 0)
+                         {
+                              nom[--nom_length] = '\0';
+                         }
+                         else if (field == 1 && prenom_length > 0)
+                         {
+                              prenom[--prenom_length] = '\0';
+                         }
+                         else if (field == 2 && telephone_length > 0)
+                         {
+                              telephone[--telephone_length] = '\0';
+                         }
+                         else if (field == 3 && login_length > 0)
+                         {
+                              login[--login_length] = '\0';
+                         }
+                    }
+               }
+               else if (event.type == SDL_TEXTINPUT)
+               {
+                    if (field == 0 && nom_length < sizeof(nom) - 1)
+                    {
+                         strcat(nom, event.text.text);
+                         nom_length++;
+                    }
+                    else if (field == 1 && prenom_length < sizeof(prenom) - 1)
+                    {
+                         strcat(prenom, event.text.text);
+                         prenom_length++;
+                    }
+                    else if (field == 2 && telephone_length < sizeof(telephone) - 1)
+                    {
+                         strcat(telephone, event.text.text);
+                         telephone_length++;
+                    }
+                    else if (field == 3 && login_length < sizeof(login) - 1)
+                    {
+                         strcat(login, event.text.text);
+                         login_length++;
+                    }
+               }
+          }
+
+          SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+          SDL_RenderClear(renderer);
+
+          renderText(renderer, "Ajouter un utilisateur", 100, 50, white, font);
+          renderText(renderer, "Nom:", 100, 100, white, font);
+          renderText(renderer, nom, 200, 100, white, font);
+          renderText(renderer, "Prenom:", 100, 150, white, font);
+          renderText(renderer, prenom, 200, 150, white, font);
+          renderText(renderer, "Telephone:", 100, 200, white, font);
+          renderText(renderer, telephone, 200, 200, white, font);
+          renderText(renderer, "Login:", 100, 250, white, font);
+          renderText(renderer, login, 200, 250, white, font);
+
+          strcpy(mot_de_passe, "passer123");
+
+          SDL_RenderPresent(renderer);
+     }
+
+     SDL_StopTextInput();
+
+     // Enregistrer l'utilisateur
+     FILE *fichier = fopen(USER_FILE, "ab");
+     if (fichier == NULL)
+     {
+          perror("Erreur d'ouverture du fichier USERS.dat");
+          return;
+     }
+
      User user;
-
-     printf("Veuillez saisir votre nom: \n");
-     scanf("%s", user.nom);
-
-     printf("Veuillez saisir votre prénom: \n");
-     scanf("%s", user.prenom);
-
-     printf("Veuillez saisir votre téléphone: \n");
-     scanf("%s", user.telephone);
-
-     printf("Veuillez saisir votre login: \n");
-     scanf("%s", user.login);
-
-     strcpy(user.mot_de_passe, "passer123");
-
-     printf("Veuillez saisir votre rôle (ADMIN, USER, USERBLOQUE): \n");
-     scanf("%s", user.role);
-
-     int id = auto_increment(USER_FILE);
-     user.user_id = id;
+     user.user_id = auto_increment(USER_FILE);
+     strcpy(user.nom, nom);
+     strcpy(user.prenom, prenom);
+     strcpy(user.telephone, telephone);
+     strcpy(user.login, login);
+     strcpy(user.mot_de_passe, chiffre);
+     strcpy(user.role, "USER");
 
      char line[512];
-     char chiffre[50];
 
-     strcpy(chiffre, user.mot_de_passe);
+     strcpy(chiffre, mot_de_passe);
      chiffrerCesar(chiffre, 10);
 
      sprintf(line, "%d %s %s %s %s %s %s\n", user.user_id, user.prenom, user.nom, user.telephone, user.login, chiffre, user.role);
 
      if (ajouter_fichier(USER_FILE, line) == 0)
      {
+          printf("Utilisateur ajouté avec succès.\n");
+          fclose(fichier);
+
           printf("Utilisateur ajouté avec succès.\n");
      }
      else
@@ -187,9 +288,10 @@ void afficherMenuAdmin(SDL_Renderer *renderer, TTF_Font *font)
           renderText(renderer, "5. Lister les categories", 100, 300, white, font);
           renderText(renderer, "6. Lister les produits", 100, 350, white, font);
           renderText(renderer, "7. Effectuer une vente", 100, 400, white, font);
-          renderText(renderer, "8. Imprimer l'état du jour", 100, 450, white, font);
-          renderText(renderer, "9. Deconnexion", 100, 500, white, font);
-          renderText(renderer, "Choisissez une option: ", 100, 550, white, font);
+          renderText(renderer, "8. Imprimer l'etat du jour", 100, 450, white, font);
+          renderText(renderer, "9. Changer mot de passe", 100, 500, white, font);
+          renderText(renderer, "10. Deconnexion", 100, 550, white, font);
+          renderText(renderer, "Choisissez une option: ", 100, 600, white, font);
 
           SDL_RenderPresent(renderer);
      }
@@ -197,7 +299,7 @@ void afficherMenuAdmin(SDL_Renderer *renderer, TTF_Font *font)
      switch (choix)
      {
      case 1:
-          ajouter_utilisateur();
+          ajouter_utilisateur(renderer, font);
           break;
      case 2:
           ajouter_categorie();
@@ -215,12 +317,14 @@ void afficherMenuAdmin(SDL_Renderer *renderer, TTF_Font *font)
           lister_produits();
           break;
      case 7:
-          // effectuer_vente();
+          // effectuer_vente(renderer, font);
           break;
      case 8:
-          // imprimer_etat_jour();
+          // imprimer_etat_jour(renderer, font);
           break;
      case 9:
+          changer_mot_de_passe(renderer, font);
+     case 10:
           printf("Déconnexion réussie.\n");
           SDL_Quit();
           TTF_Quit();
@@ -234,18 +338,15 @@ void afficherMenuAdmin(SDL_Renderer *renderer, TTF_Font *font)
      afficherMenuAdmin(renderer, font);
 }
 
-// Fonction pour changer le mot de passe
 void changer_mot_de_passe(SDL_Renderer *renderer, TTF_Font *font)
 {
-     char login[50] = "";
-     char nouveau_mdp[256] = "";
+     char login[50] = {0};
+     char nouveau_mdp[256] = {0};
      int login_length = 0;
      int mdp_length = 0;
-
-     SDL_Color white = {255, 255, 255, 255};
      int entering_login = 1;
 
-     SDL_StartTextInput();
+     SDL_Color white = {255, 255, 255, 255};
 
      int running = 1;
      while (running)
@@ -267,13 +368,19 @@ void changer_mot_de_passe(SDL_Renderer *renderer, TTF_Font *font)
                     }
                     else if (event.key.keysym.sym == SDLK_BACKSPACE)
                     {
-                         if (entering_login && login_length > 0)
+                         if (entering_login)
                          {
-                              login[--login_length] = '\0';
+                              if (login_length > 0)
+                              {
+                                   login[--login_length] = '\0';
+                              }
                          }
-                         else if (!entering_login && mdp_length > 0)
+                         else
                          {
-                              nouveau_mdp[--mdp_length] = '\0';
+                              if (mdp_length > 0)
+                              {
+                                   nouveau_mdp[--mdp_length] = '\0';
+                              }
                          }
                     }
                     else if (event.key.keysym.sym == SDLK_TAB)
@@ -283,15 +390,21 @@ void changer_mot_de_passe(SDL_Renderer *renderer, TTF_Font *font)
                }
                else if (event.type == SDL_TEXTINPUT)
                {
-                    if (entering_login && login_length < sizeof(login) - 1)
+                    if (entering_login)
                     {
-                         strcat(login, event.text.text);
-                         login_length++;
+                         if (login_length < sizeof(login) - 1)
+                         {
+                              strcat(login, event.text.text);
+                              login_length++;
+                         }
                     }
-                    else if (!entering_login && mdp_length < sizeof(nouveau_mdp) - 1)
+                    else
                     {
-                         strcat(nouveau_mdp, event.text.text);
-                         mdp_length++;
+                         if (mdp_length < sizeof(nouveau_mdp) - 1)
+                         {
+                              strcat(nouveau_mdp, event.text.text);
+                              mdp_length++;
+                         }
                     }
                }
           }
@@ -308,40 +421,52 @@ void changer_mot_de_passe(SDL_Renderer *renderer, TTF_Font *font)
           SDL_RenderPresent(renderer);
      }
 
-     SDL_StopTextInput();
-
      // Recherche et mise à jour de l'utilisateur
-     FILE *fichier = fopen(USER_FILE, "r+b");
-     if (fichier == NULL)
+     FILE *fichier = fopen(USER_FILE, "r");
+     FILE *fichier_temp = fopen(TEMP_USER_FILE, "w");
+     if (fichier == NULL || fichier_temp == NULL)
      {
-          perror("Erreur d'ouverture du fichier USER_FILE");
+          perror("Erreur d'ouverture du fichier");
           return;
      }
 
      User userTemp;
      int trouve = 0;
+     char chiffre[50];
+     char dechiffre[50];
 
-     while (fread(&userTemp, sizeof(User), 1, fichier))
+     while (fscanf(fichier, "%d %s %s %s %s %s %s", &userTemp.user_id, userTemp.nom, userTemp.prenom, userTemp.login, userTemp.telephone, userTemp.mot_de_passe, userTemp.role) == 7)
      {
           if (strcmp(userTemp.login, login) == 0)
           {
-               strcpy(userTemp.mot_de_passe, nouveau_mdp);
-               fseek(fichier, -sizeof(User), SEEK_CUR);
-               fwrite(&userTemp, sizeof(User), 1, fichier);
+               strcpy(chiffre, nouveau_mdp);
+
+               chiffrerCesar(chiffre, 10);
+
+               strcpy(userTemp.mot_de_passe, chiffre);
                trouve = 1;
-               break;
           }
+          fprintf(fichier_temp, "%d %s %s %s %s %s %s\n", userTemp.user_id, userTemp.nom, userTemp.prenom, userTemp.login, userTemp.telephone, userTemp.mot_de_passe, userTemp.role);
      }
 
      fclose(fichier);
+     fclose(fichier_temp);
 
      if (trouve)
      {
-          printf("Mot de passe mis à jour avec succès.\n");
+          if (remove(USER_FILE) == 0 && rename(TEMP_USER_FILE, USER_FILE) == 0)
+          {
+               printf("Mot de passe mis à jour avec succès.\n");
+          }
+          else
+          {
+               perror("Erreur lors de la mise à jour du fichier utilisateur");
+          }
      }
      else
      {
           printf("Utilisateur non trouvé.\n");
+          remove(TEMP_USER_FILE);
      }
 }
 
@@ -379,9 +504,9 @@ void afficherMenuUser(SDL_Renderer *renderer, TTF_Font *font)
           renderText(renderer, "1. Effectuer une vente", 100, 100, white, font);
           renderText(renderer, "2. Imprimer l'etat du jour", 100, 150, white, font);
           renderText(renderer, "3. Lister les produits", 100, 200, white, font);
-          renderText(renderer, "4. Changez le mot de passe", 100, 200, white, font);
-          renderText(renderer, "5. Deconnexion", 100, 250, white, font);
-          renderText(renderer, "Choisissez une option: ", 100, 300, white, font);
+          renderText(renderer, "4. Changez le mot de passe", 100, 250, white, font);
+          renderText(renderer, "5. Deconnexion", 100, 300, white, font);
+          renderText(renderer, "Choisissez une option: ", 100, 400, white, font);
 
           SDL_RenderPresent(renderer);
      }

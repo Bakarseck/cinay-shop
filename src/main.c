@@ -247,7 +247,7 @@ int main(int argc, char *argv[])
           return 1;
      }
 
-     TTF_Font *font = TTF_OpenFont("Roboto-Regular.ttf", 24);
+     TTF_Font *font = TTF_OpenFont("Roboto-Regular.ttf", 20);
      if (!font)
      {
           printf("Erreur de chargement de la police: %s\n", TTF_GetError());
