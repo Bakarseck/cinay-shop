@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
+#include <ctype.h>
 
 extern const char *USER_FILE;
 extern const char *VENTES_FILE;
@@ -23,37 +26,37 @@ typedef struct
 
 typedef struct
 {
-     int id;
+     int category_id;
      char libelle[50];
 } Category;
 
 typedef struct
 {
-     int id;
+     int product_id;
      char designation[50];
      double prix;
-     int quantite;
+     int quantite_stock;
      char code[6];
      char date_ajout[20];
      int category_id;
 } Product;
 
+// Déclaration de la fonction renderText
+void renderText(SDL_Renderer *renderer, const char *text, int x, int y, SDL_Color color, TTF_Font *font);
+
 int ajouter_utilisateur();
 User *lire_utilisateurs(int *taille);
 int supprimer_utilisateur(int user_id);
-
-void fonctionnaliteUser();
-void fonctionnaliteAdmin();
 
 void afficherMenuUser();
 void afficherMenuAdmin();
 
 int connexion();
 
-int ajouter_categorie(Category category);
+int ajouter_categorie();
 void lister_categories();
 
-int ajouter_produit(Product product);
+int ajouter_produit();
 void lister_produits();
 
 void ScannerInt(int *a);
