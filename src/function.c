@@ -234,6 +234,117 @@ void afficherMenuAdmin(SDL_Renderer *renderer, TTF_Font *font)
      afficherMenuAdmin(renderer, font);
 }
 
+// Fonction pour changer le mot de passe
+void changer_mot_de_passe(SDL_Renderer *renderer, TTF_Font *font)
+{
+     char login[50] = "";
+     char nouveau_mdp[256] = "";
+     int login_length = 0;
+     int mdp_length = 0;
+
+     SDL_Color white = {255, 255, 255, 255};
+     int entering_login = 1;
+
+     SDL_StartTextInput();
+
+     int running = 1;
+     while (running)
+     {
+          SDL_Event event;
+          while (SDL_PollEvent(&event))
+          {
+               if (event.type == SDL_QUIT)
+               {
+                    SDL_Quit();
+                    TTF_Quit();
+                    exit(0);
+               }
+               else if (event.type == SDL_KEYDOWN)
+               {
+                    if (event.key.keysym.sym == SDLK_RETURN)
+                    {
+                         running = 0;
+                    }
+                    else if (event.key.keysym.sym == SDLK_BACKSPACE)
+                    {
+                         if (entering_login && login_length > 0)
+                         {
+                              login[--login_length] = '\0';
+                         }
+                         else if (!entering_login && mdp_length > 0)
+                         {
+                              nouveau_mdp[--mdp_length] = '\0';
+                         }
+                    }
+                    else if (event.key.keysym.sym == SDLK_TAB)
+                    {
+                         entering_login = !entering_login;
+                    }
+               }
+               else if (event.type == SDL_TEXTINPUT)
+               {
+                    if (entering_login && login_length < sizeof(login) - 1)
+                    {
+                         strcat(login, event.text.text);
+                         login_length++;
+                    }
+                    else if (!entering_login && mdp_length < sizeof(nouveau_mdp) - 1)
+                    {
+                         strcat(nouveau_mdp, event.text.text);
+                         mdp_length++;
+                    }
+               }
+          }
+
+          SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+          SDL_RenderClear(renderer);
+
+          renderText(renderer, "Changer le mot de passe", 100, 50, white, font);
+          renderText(renderer, "Entrez votre login:", 100, 100, white, font);
+          renderText(renderer, login, 100, 150, white, font);
+          renderText(renderer, "Entrez le nouveau mot de passe:", 100, 200, white, font);
+          renderText(renderer, nouveau_mdp, 100, 250, white, font);
+
+          SDL_RenderPresent(renderer);
+     }
+
+     SDL_StopTextInput();
+
+     // Recherche et mise à jour de l'utilisateur
+     FILE *fichier = fopen(USER_FILE, "r+b");
+     if (fichier == NULL)
+     {
+          perror("Erreur d'ouverture du fichier USER_FILE");
+          return;
+     }
+
+     User userTemp;
+     int trouve = 0;
+
+     while (fread(&userTemp, sizeof(User), 1, fichier))
+     {
+          if (strcmp(userTemp.login, login) == 0)
+          {
+               strcpy(userTemp.mot_de_passe, nouveau_mdp);
+               fseek(fichier, -sizeof(User), SEEK_CUR);
+               fwrite(&userTemp, sizeof(User), 1, fichier);
+               trouve = 1;
+               break;
+          }
+     }
+
+     fclose(fichier);
+
+     if (trouve)
+     {
+          printf("Mot de passe mis à jour avec succès.\n");
+     }
+     else
+     {
+          printf("Utilisateur non trouvé.\n");
+     }
+}
+
 void afficherMenuUser(SDL_Renderer *renderer, TTF_Font *font)
 {
      int choix = -1;
@@ -268,7 +379,8 @@ void afficherMenuUser(SDL_Renderer *renderer, TTF_Font *font)
           renderText(renderer, "1. Effectuer une vente", 100, 100, white, font);
           renderText(renderer, "2. Imprimer l'etat du jour", 100, 150, white, font);
           renderText(renderer, "3. Lister les produits", 100, 200, white, font);
-          renderText(renderer, "4. Deconnexion", 100, 250, white, font);
+          renderText(renderer, "4. Changez le mot de passe", 100, 200, white, font);
+          renderText(renderer, "5. Deconnexion", 100, 250, white, font);
           renderText(renderer, "Choisissez une option: ", 100, 300, white, font);
 
           SDL_RenderPresent(renderer);
@@ -286,6 +398,9 @@ void afficherMenuUser(SDL_Renderer *renderer, TTF_Font *font)
           lister_produits();
           break;
      case 4:
+          changer_mot_de_passe(renderer, font);
+          break;
+     case 5:
           printf("Déconnexion réussie.\n");
           SDL_Quit();
           TTF_Quit();

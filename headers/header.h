@@ -47,6 +47,7 @@ void renderText(SDL_Renderer *renderer, const char *text, int x, int y, SDL_Colo
 int ajouter_utilisateur();
 User *lire_utilisateurs(int *taille);
 int supprimer_utilisateur(int user_id);
+void changer_mot_de_passe(SDL_Renderer *renderer, TTF_Font *font);
 
 void afficherMenuUser();
 void afficherMenuAdmin();
