@@ -1,9 +1,3 @@
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
 #include "../headers/header.h"
 
 #define WINDOW_WIDTH 800
@@ -68,14 +62,12 @@ char *trimNumber(char *str)
 
 int connexion(SDL_Renderer *renderer, TTF_Font *font)
 {
-     char login[50] = {0};    // Correct initialization
-     char password[50] = {0}; // Correct initialization
+     char login[50] = {0};
+     char password[50] = {0};
      int login_length = 0;
      int password_length = 0;
      int hide_password = 1;
      int entering_login = 1;
-
-     
 
      SDL_Color white = {255, 255, 255, 255};
 
@@ -289,10 +281,12 @@ int main(int argc, char *argv[])
                          if (role == 0)
                          {
                               printf("Admin connecté\n");
+                              afficherMenuAdmin(renderer, font);
                          }
                          else if (role == 1)
                          {
                               printf("Utilisateur connecté\n");
+                              afficherMenuUser(renderer, font);
                          }
                          else if (role == 2)
                          {

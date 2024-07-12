@@ -149,90 +149,154 @@ void lister_produits()
      fclose(fichier);
 }
 
-void afficherMenuAdmin()
+void afficherMenuAdmin(SDL_Renderer *renderer, TTF_Font *font)
 {
-     int choix;
+     int choix = -1;
+     SDL_Color white = {255, 255, 255, 255};
+     int running = 1;
 
-     while (1)
+     while (running)
      {
-          printf("--- Menu Administrateur ---\n");
-          printf("1. Ajouter un utilisateur\n");
-          printf("2. Ajouter une catégorie\n");
-          printf("3. Ajouter un produit\n");
-          printf("4. Lister les utilisateurs\n");
-          printf("5. Lister les catégories\n");
-          printf("6. Lister les produits\n");
-          printf("7. Effectuer une vente\n");
-          printf("8. Imprimer l'état du jour\n");
-          printf("9. Déconnexion\n");
-          printf("Choisissez une option: ");
-          scanf("%d", &choix);
-
-          switch (choix)
+          SDL_Event event;
+          while (SDL_PollEvent(&event))
           {
-          case 1:
-               ajouter_utilisateur();
-               break;
-          case 2:
-               ajouter_categorie();
-               break;
-          case 3:
-               ajouter_produit();
-               break;
-          case 4:
-               break;
-          case 5:
-               lister_categories();
-               break;
-          case 6:
-               lister_produits();
-               break;
-          case 7:
-               break;
-          case 8:
-               break;
-          case 9:
-               printf("Déconnexion réussie.\n");
-               exit(0);
-               return;
-          default:
-               printf("Option invalide. Veuillez réessayer.\n");
-               break;
+               if (event.type == SDL_QUIT)
+               {
+                    SDL_Quit();
+                    TTF_Quit();
+                    exit(0);
+               }
+               else if (event.type == SDL_KEYDOWN)
+               {
+                    if (event.key.keysym.sym >= SDLK_1 && event.key.keysym.sym <= SDLK_9)
+                    {
+                         choix = event.key.keysym.sym - SDLK_0;
+                         running = 0;
+                    }
+               }
           }
+
+          SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+          SDL_RenderClear(renderer);
+
+          renderText(renderer, "--- Menu Administrateur ---", 100, 50, white, font);
+          renderText(renderer, "1. Ajouter un utilisateur", 100, 100, white, font);
+          renderText(renderer, "2. Ajouter une categorie", 100, 150, white, font);
+          renderText(renderer, "3. Ajouter un produit", 100, 200, white, font);
+          renderText(renderer, "4. Lister les utilisateurs", 100, 250, white, font);
+          renderText(renderer, "5. Lister les categories", 100, 300, white, font);
+          renderText(renderer, "6. Lister les produits", 100, 350, white, font);
+          renderText(renderer, "7. Effectuer une vente", 100, 400, white, font);
+          renderText(renderer, "8. Imprimer l'état du jour", 100, 450, white, font);
+          renderText(renderer, "9. Deconnexion", 100, 500, white, font);
+          renderText(renderer, "Choisissez une option: ", 100, 550, white, font);
+
+          SDL_RenderPresent(renderer);
      }
+
+     switch (choix)
+     {
+     case 1:
+          ajouter_utilisateur();
+          break;
+     case 2:
+          ajouter_categorie();
+          break;
+     case 3:
+          ajouter_produit();
+          break;
+     case 4:
+          // lister_utilisateurs();
+          break;
+     case 5:
+          lister_categories();
+          break;
+     case 6:
+          lister_produits();
+          break;
+     case 7:
+          // effectuer_vente();
+          break;
+     case 8:
+          // imprimer_etat_jour();
+          break;
+     case 9:
+          printf("Déconnexion réussie.\n");
+          SDL_Quit();
+          TTF_Quit();
+          exit(0);
+          return;
+     default:
+          printf("Option invalide. Veuillez réessayer.\n");
+          break;
+     }
+
+     afficherMenuAdmin(renderer, font);
 }
 
-void afficherMenuUser()
+void afficherMenuUser(SDL_Renderer *renderer, TTF_Font *font)
 {
-     int choix;
+     int choix = -1;
+     SDL_Color white = {255, 255, 255, 255};
+     int running = 1;
 
-     while (1)
+     while (running)
      {
-          printf("--- Menu Utilisateur ---\n");
-          printf("1. Effectuer une vente\n");
-          printf("2. Imprimer l'état du jour\n");
-          printf("3. Lister les produits\n");
-          printf("4. Déconnexion\n");
-          printf("Choisissez une option: ");
-          scanf("%d", &choix);
-
-          switch (choix)
+          SDL_Event event;
+          while (SDL_PollEvent(&event))
           {
-          case 1:
-               break;
-          case 2:
-               break;
-          case 3:
-               break;
-          case 4:
-               printf("Déconnexion réussie.\n");
-               exit(0);
-               return;
-          default:
-               printf("Option invalide. Veuillez réessayer.\n");
-               break;
+               if (event.type == SDL_QUIT)
+               {
+                    SDL_Quit();
+                    TTF_Quit();
+                    exit(0);
+               }
+               else if (event.type == SDL_KEYDOWN)
+               {
+                    if (event.key.keysym.sym >= SDLK_1 && event.key.keysym.sym <= SDLK_4)
+                    {
+                         choix = event.key.keysym.sym - SDLK_0;
+                         running = 0;
+                    }
+               }
           }
+
+          SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+          SDL_RenderClear(renderer);
+
+          renderText(renderer, "--- Menu Utilisateur ---", 100, 50, white, font);
+          renderText(renderer, "1. Effectuer une vente", 100, 100, white, font);
+          renderText(renderer, "2. Imprimer l'etat du jour", 100, 150, white, font);
+          renderText(renderer, "3. Lister les produits", 100, 200, white, font);
+          renderText(renderer, "4. Deconnexion", 100, 250, white, font);
+          renderText(renderer, "Choisissez une option: ", 100, 300, white, font);
+
+          SDL_RenderPresent(renderer);
      }
+
+     switch (choix)
+     {
+     case 1:
+          // effectuer_vente();
+          break;
+     case 2:
+          // imprimer_etat_jour();
+          break;
+     case 3:
+          lister_produits();
+          break;
+     case 4:
+          printf("Déconnexion réussie.\n");
+          SDL_Quit();
+          TTF_Quit();
+          exit(0);
+          return;
+     default:
+          printf("Option invalide. Veuillez réessayer.\n");
+          break;
+     }
+
+     afficherMenuUser(renderer, font);
 }
 
 int Atoi(char text[255])
